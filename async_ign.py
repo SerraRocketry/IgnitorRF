@@ -49,7 +49,7 @@ class IgnitorRFApp(Ctk.CTk):
         # Button to stop logging, initially hidden
         self.btn_stop_log = Ctk.CTkButton(
             master=self, text='Parar Log', command=self.stop_log)
-        self.btn_stop_log.grid(row=3, column=0, padx=20, pady=10)
+        self.btn_stop_log.grid(row=2, column=0, padx=20, pady=10)
         self.btn_stop_log.grid_remove()
 
         # Button to send tare command, initially hidden
@@ -121,7 +121,6 @@ class IgnitorRFApp(Ctk.CTk):
         if hasattr(self, 'com'):
             self.btn_ativar.configure(
                 text='Iniciar contagem', command=self.start_countdown)
-            self.btn_stop_log.grid_remove() 
         else:
             self.label_status.configure(text='Conecte-se primeiro')
 
@@ -164,18 +163,18 @@ def recebido(com: serial.Serial, app: IgnitorRFApp):
             com.isOpen()
             com.reset_output_buffer()
             com.write(b'A')
-            msg = com.readline().decode().strip()
+            msg = com.readline().decode("utf-8").strip()
             if msg:
                 app.label_message.insert(
                     index="0.0", text=get_date_time() + msg + '\n')
             else:
                 app.label_message.insert(
-                    index="0.0", text='Desconectado do Ignitor.')
+                    index="0.0", text='Desconectado do Ignitor.\n')
         except serial.SerialException:
             app.label_status.configure(text='Falha na conexão.')
             disconnect(com, app)
             break
-        time.sleep(0.1)
+        time.sleep(0.5)
 
 # Send a command to the serial port
 def send_command(com: serial.Serial, command: bytes, app: IgnitorRFApp):
@@ -184,7 +183,7 @@ def send_command(com: serial.Serial, command: bytes, app: IgnitorRFApp):
         com.reset_output_buffer()
         com.write(command)
         com.reset_input_buffer()
-        msg = com.readline().decode().strip()
+        msg = com.readline().decode("utf-8").strip()
         app.label_status.configure(text=msg)
         app.label_message.insert(
             index="0.0", text=get_date_time() + msg + '\n')
