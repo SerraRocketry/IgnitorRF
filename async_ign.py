@@ -75,7 +75,7 @@ class IgnitorRFApp(Ctk.CTk):
         ports = check_usb_connection()
         self.menu_port = Ctk.CTkOptionMenu(self, values=ports)
         self.menu_port.grid(row=3, column=0, padx=20, pady=10)
-        self.menu_port.set('Portas')
+        self.menu_port.set('/dev/ttyUSB0')
 
     # Connect to the selected port
     def connect(self):
