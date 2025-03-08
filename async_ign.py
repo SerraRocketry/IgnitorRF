@@ -203,7 +203,7 @@ def deactivate(com: serial.Serial, app: IgnitorRFApp):
 def count_down(com: serial.Serial, app: IgnitorRFApp):
     try:
         com.isOpen()
-        esp_save_log(com, app)
+        # esp_save_log(com, app)
         for cont in range(11):
             if cont < 10:
                 app.label_status.configure(text=f'Ativando em: {10 - cont}')
@@ -267,11 +267,11 @@ def check_still_connect(com: serial.Serial) -> bool:
 
 # Main entry point of the application
 if __name__ == '__main__':
-    if check_usb_connection():
-        Ctk.set_appearance_mode('System')
-        Ctk.set_default_color_theme('blue')
-        app = IgnitorRFApp()
-        app.mainloop()
-    else:
-        print('Nenhuma porta disponível.')
-        sys.exit(1)
+    # if check_usb_connection():
+    Ctk.set_appearance_mode('System')
+    Ctk.set_default_color_theme('blue')
+    app = IgnitorRFApp()
+    app.mainloop()
+    # else:
+    #     print('Nenhuma porta disponível.')
+    #     sys.exit(1)
