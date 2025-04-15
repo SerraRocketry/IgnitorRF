@@ -28,17 +28,22 @@ def recebido(com: serial.Serial):
         try:
             com.isOpen()
             com.reset_output_buffer()
+            start_time = datetime.now()
             com.write(b'A')
-            msg = com.readline().decode().strip()
+            msg = com.readline()
+            msg = msg.decode("utf-8").strip()
+            end_time = datetime.now()
+            ping = (end_time - start_time).total_seconds() * 1000
             if msg:
-                print(get_date_time() + msg)
+                print(f'{ping:.2f}ms - {get_date_time()}{msg}')
             else:
-                print('Desconectado do Ignitor.')
+                print(get_date_time() + 'Desconectado do Ignitor.')
         except serial.SerialException:
             print('Falha na conexão.')
             disconnect(com)
             break
-        time.sleep(0.5)
+        # time.sleep(ping / 1000 if ping else 0.5)
+        time.sleep(1)
 
 # Send a command to the serial port
 def send_command(com: serial.Serial, command: bytes):
@@ -46,8 +51,8 @@ def send_command(com: serial.Serial, command: bytes):
         com.isOpen()
         com.reset_output_buffer()
         com.write(command)
-        msg = com.readline().decode().strip()
-        print(msg)
+        msg = com.readline()
+        msg = msg.decode("utf-8").strip()
         print(get_date_time() + msg)
     except serial.SerialException:
         print('Falha na conexão.')
@@ -64,30 +69,21 @@ def deactivate(com: serial.Serial):
 def count_down(com: serial.Serial, event: threading.Event):
     try:
         com.isOpen()
-        esp_save_log(com)
+        send_command(com, b'C')
         for cont in range(11):
             if cont < 10:
                 print(f'Ativando em: {10 - cont}')
             else:
                 fire(com)
-                time.sleep(5)
+                event.wait(1)
                 deactivate(com)
                 break
-            time.sleep(1)
+            event.wait(1)
             if event.is_set():
                 deactivate(com)
                 break
     except serial.SerialException:
         print('Falha na conexão.')
-        esp_stop_log(com)
-
-# Send the save log command to the serial port
-def esp_save_log(com: serial.Serial):
-    send_command(com, b'C')
-
-# Send the stop log command to the serial port
-def esp_stop_log(com: serial.Serial):
-    send_command(com, b'D')
 
 # Save the serial log to a file
 def save_serial_log(msg: str):
@@ -125,8 +121,15 @@ def check_still_connect(com: serial.Serial) -> bool:
 if __name__ == '__main__':
     ports = check_usb_connection()
     if ports:
-        print('Portas disponíveis:', ports)
+        print('Portas disponíveis:', )
+        for i, port in enumerate(ports):
+            print(f'{i + 1}: {port}')
         port = input('Selecione uma porta: ')
+        try:
+            port = ports[int(port) - 1]
+        except (ValueError, IndexError):
+            print('Porta inválida.')
+            sys.exit(1)
         if port in ports:
             com = connect(port)
             event = threading.Event()
@@ -141,6 +144,7 @@ if __name__ == '__main__':
                     threading.Thread(target=count_down, args=(com, event)).start()
                 elif command == 'cancelar':
                     event.set()
+                    deactivate(com)
                 elif command == 'sair':
                     disconnect(com)
                     break
