@@ -68,7 +68,7 @@ class IgnitorRFApp(Ctk.CTk):
         port = self.menu_port.get()
         if port != 'Portas':
             self.com = connect(port, self)
-            self.label_status.configure(text='Conectado.')
+            self.label_status.configure(text='Aguardando comando.')
             self.btn_conectar.configure(
                 text='Desconectar', command=self.disconnect)
             self.btn_tare.grid()
@@ -111,6 +111,14 @@ class IgnitorRFApp(Ctk.CTk):
         if self.com:
             esp_tare()
 
+def handle_msg(msg: str):
+    global comma
+    msg = msg.decode("utf-8").strip()
+
+    if msg in {'Ativado.', 'Desativado.', 'Iniciando contagem.', 'Zerando célula.', 'Comando desconhecido.', 'Reiniciando.'}:
+        comma = None
+
+    return msg
 
 def get_date_time() -> str:
     return datetime.now().strftime('%H:%M:%S.%f')[:-3] + ' -> '
@@ -153,24 +161,27 @@ def recebido(com: serial.Serial, app: IgnitorRFApp):
 
             com.write(command)
             msg = com.readline()
-            msg = msg.decode("utf-8").strip()
+            hmsg = handle_msg(msg)
+            print(f'Msg: {hmsg}', end=' | ')
             end_time = datetime.now()
 
             ping = (end_time - start_time).total_seconds() * 1000
             print(f'Ping: {ping:.2f} ms')
 
-            log_message = get_date_time() + (msg if msg else 'Desconectado do Ignitor.') + '\n'
+            log_message = get_date_time() + (hmsg if hmsg else 'Desconectado do Ignitor.') + '\n'
             app.label_message.insert("0.0", log_message)
-            # app.label_status.configure(text=msg if msg else 'Desconectado do Ignitor.')
 
-            comma = None
+            if hmsg == 'Ativado.':
+                app.label_status.configure(text='Ativado.')
+            elif hmsg == 'Desativado.': 
+                app.label_status.configure(text='Aguardando comando.')
+
         except serial.SerialException as e:
             print(f'Erro de comunicação: {e}')
         except Exception as e:
             app.label_status.configure(text=f'Erro inesperado: {e}')
             raise
         time.sleep(ping / 1000)
-        # time.sleep(1)
 
 
 def send_command(command: bytes):
@@ -192,12 +203,12 @@ def deactivate(app: IgnitorRFApp):
 def count_down(com: serial.Serial, app: IgnitorRFApp):
     try:
         send_command(b'C')
-        for cont in range(11):
+        for cont in range(4):
             if app.event.is_set():
                 deactivate(app)
                 break
-            if cont < 10:
-                app.label_status.configure(text=f'Ativando em: {10 - cont}')
+            if cont < 3:
+                app.label_status.configure(text=f'Ativando em: {3 - cont}')
             else:
                 fire()
                 app.event.wait(3)
