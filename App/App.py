@@ -16,7 +16,7 @@ def log_message(message: str):
 
 def save_log(msg: str):
     try:
-        filename = f'Ignitor_RF/App/Data/log_{datetime.now().strftime("%d-%m-%Y_%H-%M-%S")}.txt'
+        filename = f'/log_{datetime.now().strftime("%d-%m-%Y_%H-%M-%S")}.txt'
         with open(filename, 'w') as file:
             file.write(msg)
     except Exception as e:
@@ -38,23 +38,38 @@ def thread_p2p():
             log_message(f'Erro na conexão: {e}')
 
         ui.pingLabel.setText(f'{ping:.2f} ms')
-        # time.sleep(ping / 1000 if ping > 0 else 0.5)
-        time.sleep(0.2)
+        time.sleep(ping / 1000 if ping > 0 else 0.5)
+        # time.sleep(0.2)
+
 
 def thread_countdown():
     com.send_command(b'C')
     for cont in range(11):
-        if cont < 10:
-            ui.receivedLabel.setText(f'Ativando em {10 - cont}')
+        if com.check_connection():
+            if cont < 10:
+                ui.receivedLabel.setText(f'Ativando em {10 - cont}')
+            else:
+                com.send_command(b'1')
+                time.sleep(3)
+                com.send_command(b'0')
+                # countdown_reset()
+                break
+            time.sleep(1)
         else:
-            com.send_command(b'1')
-            time.sleep(3)
-            com.send_command(b'0')
+            log_message('Falha na conexão.')
             break
-        time.sleep(1)
+
 
 def start_countdown():
+    # ui.countdownButton.setText('Desativar')
+    # ui.countdownButton.clicked.connect(lambda: com.close())
     threading.Thread(target=thread_countdown, daemon=True).start()
+
+
+def countdown_reset():
+    ui.countdownButton.setText('Contagem Regressiva')
+    ui.countdownButton.clicked.connect(lambda: start_countdown())
+
 
 def handle_response(response: str):
     global comma

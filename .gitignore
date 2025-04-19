@@ -1,0 +1,28 @@
+# Ignore build directory
+build/
+
+# Ignore dist directory
+dist/
+
+# Ignore App.spec file
+App.spec
+
+# Ignore Python cache files
+__pycache__/
+*.py[cod]
+
+# Ignore virtual environment directories
+venv/
+.env/
+
+# Ignore log files
+*.log
+
+# Ignore temporary files
+*.tmp
+*.swp
+*.bak
+
+# Ignore system files
+.DS_Store
+Thumbs.db
