@@ -256,11 +256,11 @@ def check_still_connect(com: serial.Serial) -> bool:
 
 
 if __name__ == '__main__':
-    if check_usb_connection():
-        Ctk.set_appearance_mode('System')
-        Ctk.set_default_color_theme('blue')
-        app = IgnitorRFApp()
-        app.mainloop()
-    else:
-        print('Nenhuma porta disponível.')
-        sys.exit(1)
+    # if check_usb_connection():
+    Ctk.set_appearance_mode('System')
+    Ctk.set_default_color_theme('blue')
+    app = IgnitorRFApp()
+    app.mainloop()
+    # else:
+    #     print('Nenhuma porta disponível.')
+    #     sys.exit(1)
