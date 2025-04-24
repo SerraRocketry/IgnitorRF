@@ -44,7 +44,7 @@ def thread_p2p():
 
 def thread_countdown():
     global comma
-    set_queue_command(b'C')
+    com.send_command(b'C')
     for cont in range(11):
         if com.check_connection():
             if cont < 10:
@@ -141,7 +141,7 @@ def setup_buttons_commands():
     ui.activateButton.clicked.connect(lambda: set_queue_command(b'1'))
     ui.desactivateButton.clicked.connect(lambda: set_queue_command(b'0'))
     ui.countdownButton.clicked.connect(lambda: start_countdown())
-    ui.tareButton.clicked.connect(lambda: set_queue_command(b'T'))
+    ui.tareButton.clicked.connect(lambda: set_queue_command(b'E'))
     ui.rebootButton.clicked.connect(lambda: set_queue_command(b'R'))
     ui.logButton.clicked.connect(lambda: save_log(ui.textEdit.toPlainText()))
 

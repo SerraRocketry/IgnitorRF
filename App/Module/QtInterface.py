@@ -3,21 +3,21 @@ from PySide6.QtGui import (QPalette, QColor, QFont, QCursor, QTextCursor, QPixma
 from PySide6.QtWidgets import (QApplication, QComboBox, QFrame, QLabel, QMainWindow,
                                QPushButton, QScrollArea, QWidget, QAbstractScrollArea, QTextEdit)
 # open image with PIL
-from PIL import Image
-import os
-from pathlib import Path
+# from PIL import Image
+# import os
+# from pathlib import Path
 
 # Get the current directory
-current_dir = Path(__file__).resolve().parent
+# current_dir = Path(__file__).resolve().parent
 # Get the parent directory
-parent_dir = current_dir.parent
+# parent_dir = current_dir.parent
 # Get the path to the image
-image_path = os.path.join(parent_dir, 'Assets', 'LOGO.png')
+# image_path = os.path.join(parent_dir, 'Assets', 'LOGO.png')
 # Check if the image exists
-if not os.path.exists(image_path):
-    raise FileNotFoundError(f"Image not found: {image_path}")
+# if not os.path.exists(image_path):
+    # raise FileNotFoundError(f"Image not found: {image_path}")
 # Load the image with PIL
-image = Image.open(image_path)
+# image = Image.open(image_path)
 # # Resize the image to 181x141
 # image = image.resize((181, 181))
 # # Save the image
@@ -35,6 +35,9 @@ class Ui_IgnitorRF(object):
         palette.setColor(QPalette.ColorRole.Button, QColor(36, 31, 49))
         palette.setColor(QPalette.ColorRole.Text, QColor(203, 203, 226))
         palette.setColor(QPalette.ColorRole.Highlight, QColor(97, 53, 131))
+        palette.setColor(QPalette.ColorRole.WindowText, QColor(203, 203, 226))
+        palette.setColor(QPalette.ColorRole.ButtonText, QColor(203, 203, 226))
+        palette.setColor(QPalette.ColorRole.Base, QColor(0, 0, 20))
         IgnitorRF.setPalette(palette)
 
         # Central widget
@@ -50,16 +53,26 @@ class Ui_IgnitorRF(object):
         self.portsBox.setGeometry(10, 10, 181, 31)
         self.portsBox.setObjectName("portsBox")
         self.portsBox.addItems(ports)
+        # flat style like buttons
+        self.portsBox.setStyleSheet(
+            "QComboBox {background-color: rgb(36, 31, 49); color: rgb(203, 203, 226); border: 1px solid rgb(97, 53, 131); border-radius: 5px; padding: 5px;} QComboBox:hover {background-color: rgb(97, 53, 131);}"
+            "QComboBox::drop-down {border: 0px;}")
 
         self.connectButton = QPushButton("Conectar", self.menu)
         self.connectButton.setGeometry(10, 90, 181, 31)
         self.connectButton.setCursor(
             QCursor(Qt.CursorShape.PointingHandCursor))
+        self.connectButton.setStyleSheet(
+            "QPushButton {background-color: rgb(36, 31, 49); color: rgb(203, 203, 226); border: 1px solid rgb(97, 53, 131); border-radius: 5px; padding: 5px;} QPushButton:hover {background-color: rgb(97, 53, 131);}")
+
 
         self.disconnectButton = QPushButton("Desconectar", self.menu)
         self.disconnectButton.setGeometry(10, 130, 181, 31)
         self.disconnectButton.setCursor(
             QCursor(Qt.CursorShape.PointingHandCursor))
+        self.disconnectButton.setStyleSheet(
+            "QPushButton {background-color: rgb(36, 31, 49); color: rgb(203, 203, 226); border: 1px solid rgb(97, 53, 131); border-radius: 5px; padding: 5px;} QPushButton:hover {background-color: rgb(97, 53, 131);}")
+
         self.disconnectButton.setEnabled(False)
 
         self.statusLabel = QLabel("Desconectado", self.menu)
@@ -76,33 +89,45 @@ class Ui_IgnitorRF(object):
         self.countdownButton.setGeometry(10, 230, 181, 26)
         self.countdownButton.setCursor(
             QCursor(Qt.CursorShape.PointingHandCursor))
+        self.countdownButton.setStyleSheet(
+            "QPushButton {background-color: rgb(36, 31, 49); color: rgb(203, 203, 226); border: 1px solid rgb(97, 53, 131); border-radius: 5px; padding: 5px;} QPushButton:hover {background-color: rgb(97, 53, 131);}")
         self.countdownButton.setEnabled(False)
 
         self.activateButton = QPushButton("Ativar", self.menu)
         self.activateButton.setGeometry(10, 270, 181, 26)
         self.activateButton.setCursor(
             QCursor(Qt.CursorShape.PointingHandCursor))
+        self.activateButton.setStyleSheet(
+            "QPushButton {background-color: rgb(36, 31, 49); color: rgb(203, 203, 226); border: 1px solid rgb(97, 53, 131); border-radius: 5px; padding: 5px;} QPushButton:hover {background-color: rgb(97, 53, 131);}")
         self.activateButton.setEnabled(False)
 
         self.desactivateButton = QPushButton("Desativar", self.menu)
         self.desactivateButton.setGeometry(10, 310, 181, 26)
         self.desactivateButton.setCursor(
             QCursor(Qt.CursorShape.PointingHandCursor))
+        self.desactivateButton.setStyleSheet(
+            "QPushButton {background-color: rgb(36, 31, 49); color: rgb(203, 203, 226); border: 1px solid rgb(97, 53, 131); border-radius: 5px; padding: 5px;} QPushButton:hover {background-color: rgb(97, 53, 131);}")
         self.desactivateButton.setEnabled(False)
 
         self.tareButton = QPushButton("Tare", self.menu)
         self.tareButton.setGeometry(10, 350, 181, 26)
         self.tareButton.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
+        self.tareButton.setStyleSheet(
+            "QPushButton {background-color: rgb(36, 31, 49); color: rgb(203, 203, 226); border: 1px solid rgb(97, 53, 131); border-radius: 5px; padding: 5px;} QPushButton:hover {background-color: rgb(97, 53, 131);}")
         self.tareButton.setEnabled(False)
 
         self.rebootButton = QPushButton("Reiniciar", self.menu)
         self.rebootButton.setGeometry(10, 390, 181, 26)
         self.rebootButton.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
+        self.rebootButton.setStyleSheet(
+            "QPushButton {background-color: rgb(36, 31, 49); color: rgb(203, 203, 226); border: 1px solid rgb(97, 53, 131); border-radius: 5px; padding: 5px;} QPushButton:hover {background-color: rgb(97, 53, 131);}")
         self.rebootButton.setEnabled(False)
 
         self.closeButton = QPushButton("Fechar", self.menu)
         self.closeButton.setGeometry(10, 655, 181, 31)
         self.closeButton.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
+        self.closeButton.setStyleSheet(
+            "QPushButton {background-color: rgb(36, 31, 49); color: rgb(203, 203, 226); border: 1px solid rgb(97, 53, 131); border-radius: 5px; padding: 5px;} QPushButton:hover {background-color: rgb(97, 53, 131);}")
         self.closeButton.clicked.connect(lambda: self.close_app(IgnitorRF))
 
         # Show frame
@@ -137,6 +162,8 @@ class Ui_IgnitorRF(object):
         self.logButton = QPushButton("Salvar Log", self.show)
         self.logButton.setGeometry(440, 650, 161, 31)
         self.logButton.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
+        self.logButton.setStyleSheet(
+            "QPushButton {background-color: rgb(36, 31, 49); color: rgb(203, 203, 226); border: 1px solid rgb(97, 53, 131); border-radius: 5px; padding: 5px;} QPushButton:hover {background-color: rgb(97, 53, 131);}")
         self.logButton.setEnabled(False)
 
         self.pingLabel = QLabel("0.0 ms", self.show)
@@ -175,10 +202,10 @@ class Ui_IgnitorRF(object):
         self.line_5.setFrameShape(QFrame.Shape.HLine)
         self.line_5.setFrameShadow(QFrame.Shadow.Sunken)
 
-        self.logoLabel = QLabel(self.menu)
-        self.logoLabel.setGeometry(15, 460, 181, 181)
-        self.logoLabel.setPixmap(QPixmap(image_path))
-        self.logoLabel.setScaledContents(True)
+        # self.logoLabel = QLabel(self.menu)
+        # self.logoLabel.setGeometry(15, 460, 181, 181)
+        # self.logoLabel.setPixmap(QPixmap(image_path))
+        # self.logoLabel.setScaledContents(True)
 
         IgnitorRF.setCentralWidget(self.centralwidget)
 
