@@ -27,6 +27,7 @@ def thread_p2p():
     global comma
     comma = None
     while com.check_connection():
+        ping = 0
         try:
             start = datetime.now()
             com.send_command(comma or b'A')
@@ -39,20 +40,20 @@ def thread_p2p():
 
         ui.pingLabel.setText(f'{ping:.2f} ms')
         time.sleep(ping / 1000 if ping > 0 else 0.5)
-        # time.sleep(0.2)
 
 
 def thread_countdown():
-    com.send_command(b'C')
+    global comma
+    set_queue_command(b'C')
     for cont in range(11):
         if com.check_connection():
             if cont < 10:
                 ui.receivedLabel.setText(f'Ativando em {10 - cont}')
             else:
-                com.send_command(b'1')
+                set_queue_command(b'1')
                 time.sleep(3)
-                com.send_command(b'0')
-                # countdown_reset()
+                set_queue_command(b'0')
+                countdown_reset()
                 break
             time.sleep(1)
         else:
@@ -61,8 +62,8 @@ def thread_countdown():
 
 
 def start_countdown():
-    # ui.countdownButton.setText('Desativar')
-    # ui.countdownButton.clicked.connect(lambda: com.close())
+    ui.countdownButton.setText('Desativar')
+    ui.countdownButton.clicked.connect(lambda: print('Desativar'))
     threading.Thread(target=thread_countdown, daemon=True).start()
 
 
@@ -82,24 +83,26 @@ def handle_response(response: str):
         ui.receivedLabel.setText(f'{response}')
 
 
-def connect(port: str, ui):
+def set_queue_command(command: bytes):
+    global comma
+    comma = command
+
+
+def connect(port: str):
     global com
-    com = apc220(port)
+    try:
+        com = apc220(port)
+    except Exception as e:
+        log_message(f'Falha ao conectar: {e}')
+        ui.receivedLabel.setText('Falha ao conectar.')
+        return
     ui.receivedLabel.setText('Conectado.')
     ui.statusLabel.setText('Conectado')
-    ui.logButton.setEnabled(True)
-    ui.connectButton.setEnabled(False)
-    ui.disconnectButton.setEnabled(True)
-    ui.portsBox.setEnabled(False)
-    ui.activateButton.setEnabled(True)
-    ui.desactivateButton.setEnabled(True)
-    ui.countdownButton.setEnabled(True)
-    ui.tareButton.setEnabled(True)
-    ui.rebootButton.setEnabled(True)
+    setup_buttons_on_connect()
     threading.Thread(target=thread_p2p, daemon=True).start()
 
 
-def reset_ui_on_disconnect(ui):
+def reset_ui_on_disconnect():
     ui.receivedLabel.setText('Desconectado.')
     ui.statusLabel.setText('Desconectado')
     ui.logButton.setEnabled(False)
@@ -114,9 +117,33 @@ def reset_ui_on_disconnect(ui):
     ui.pingLabel.setText('0.00 ms')
 
 
-def disconnect(com, ui):
+def disconnect(com: apc220):
     com.close()
-    reset_ui_on_disconnect(ui)
+    reset_ui_on_disconnect()
+
+
+def setup_buttons_on_connect():
+    ui.logButton.setEnabled(True)
+    ui.connectButton.setEnabled(False)
+    ui.disconnectButton.setEnabled(True)
+    ui.portsBox.setEnabled(False)
+    ui.activateButton.setEnabled(True)
+    ui.desactivateButton.setEnabled(True)
+    ui.countdownButton.setEnabled(True)
+    ui.tareButton.setEnabled(True)
+    ui.rebootButton.setEnabled(True)
+
+
+def setup_buttons_commands():
+    ui.connectButton.clicked.connect(
+        lambda: connect(ui.portsBox.currentText()))
+    ui.disconnectButton.clicked.connect(lambda: disconnect(com))
+    ui.activateButton.clicked.connect(lambda: set_queue_command(b'1'))
+    ui.desactivateButton.clicked.connect(lambda: set_queue_command(b'0'))
+    ui.countdownButton.clicked.connect(lambda: start_countdown())
+    ui.tareButton.clicked.connect(lambda: set_queue_command(b'T'))
+    ui.rebootButton.clicked.connect(lambda: set_queue_command(b'R'))
+    ui.logButton.clicked.connect(lambda: save_log(ui.textEdit.toPlainText()))
 
 
 if __name__ == "__main__":
@@ -124,14 +151,6 @@ if __name__ == "__main__":
     app = QApplication([])
     MainWindow = QMainWindow()
     ui = Ui_IgnitorRF(IgnitorRF=MainWindow, ports=ports)
-    ui.connectButton.clicked.connect(
-        lambda: connect(ui.portsBox.currentText(), ui))
-    ui.disconnectButton.clicked.connect(lambda: disconnect(com, ui))
-    ui.activateButton.clicked.connect(lambda: com.send_command(b'1'))
-    ui.desactivateButton.clicked.connect(lambda: com.send_command(b'0'))
-    ui.countdownButton.clicked.connect(lambda: start_countdown())
-    ui.tareButton.clicked.connect(lambda: com.send_command(b'E'))
-    ui.rebootButton.clicked.connect(lambda: com.send_command(b'R'))
-    ui.logButton.clicked.connect(lambda: save_log(ui.textEdit.toPlainText()))
+    setup_buttons_commands()
     MainWindow.show()
     app.exec()

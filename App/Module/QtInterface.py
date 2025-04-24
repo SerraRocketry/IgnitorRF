@@ -1,7 +1,27 @@
 from PySide6.QtCore import (QCoreApplication, QSize, Qt, QMetaObject, QRect)
-from PySide6.QtGui import (QPalette, QColor, QFont, QCursor, QTextCursor)
+from PySide6.QtGui import (QPalette, QColor, QFont, QCursor, QTextCursor, QPixmap)
 from PySide6.QtWidgets import (QApplication, QComboBox, QFrame, QLabel, QMainWindow,
                                QPushButton, QScrollArea, QWidget, QAbstractScrollArea, QTextEdit)
+# open image with PIL
+from PIL import Image
+import os
+from pathlib import Path
+
+# Get the current directory
+current_dir = Path(__file__).resolve().parent
+# Get the parent directory
+parent_dir = current_dir.parent
+# Get the path to the image
+image_path = os.path.join(parent_dir, 'Assets', 'LOGO.png')
+# Check if the image exists
+if not os.path.exists(image_path):
+    raise FileNotFoundError(f"Image not found: {image_path}")
+# Load the image with PIL
+image = Image.open(image_path)
+# # Resize the image to 181x141
+# image = image.resize((181, 181))
+# # Save the image
+# image.save(image_path)
 
 
 class Ui_IgnitorRF(object):
@@ -13,7 +33,7 @@ class Ui_IgnitorRF(object):
         palette = QPalette()
         palette.setColor(QPalette.ColorRole.Window, QColor(36, 31, 49))
         palette.setColor(QPalette.ColorRole.Button, QColor(36, 31, 49))
-        palette.setColor(QPalette.ColorRole.Text, QColor(255, 255, 255))
+        palette.setColor(QPalette.ColorRole.Text, QColor(203, 203, 226))
         palette.setColor(QPalette.ColorRole.Highlight, QColor(97, 53, 131))
         IgnitorRF.setPalette(palette)
 
@@ -101,15 +121,12 @@ class Ui_IgnitorRF(object):
         self.textEdit.setGeometry(0, 0, 1021, 411)
         self.textEdit.setFont(QFont("JetBrains Mono", 14))
         self.textEdit.setReadOnly(True)
-
         self.textCursor = QTextCursor(self.textEdit.document())
         self.textEdit.setTextCursor(self.textCursor)
         block_format = self.textCursor.blockFormat()
         block_format.setTextIndent(50)
         self.textCursor.setBlockFormat(block_format)
-
         self.textCursor.insertText("Aguardando conexão...\n")
-
         self.textEdit.textChanged.connect(lambda: self.textEdit.moveCursor(QTextCursor.MoveOperation.End))
 
         self.receivedLabel = QLabel("Aguardando conexão.", self.show)
@@ -157,6 +174,11 @@ class Ui_IgnitorRF(object):
         self.line_5.setGeometry(QRect(0, 410, 201, 51))
         self.line_5.setFrameShape(QFrame.Shape.HLine)
         self.line_5.setFrameShadow(QFrame.Shadow.Sunken)
+
+        self.logoLabel = QLabel(self.menu)
+        self.logoLabel.setGeometry(15, 460, 181, 181)
+        self.logoLabel.setPixmap(QPixmap(image_path))
+        self.logoLabel.setScaledContents(True)
 
         IgnitorRF.setCentralWidget(self.centralwidget)
 

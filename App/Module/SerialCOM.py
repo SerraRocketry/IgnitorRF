@@ -7,16 +7,20 @@ class apc220():
         self.port = port
         self.baudrate = baudrate
         self.timeout = timeout
-        self.serial = serial.Serial(
-            port=port,
-            baudrate=baudrate,
-            timeout=timeout,
-            xonxoff=False,
-            rtscts=False,
-            write_timeout=timeout,
-            dsrdtr=False,
-            inter_byte_timeout=None
-        )
+        try:
+            self.serial = serial.Serial(
+                port=port,
+                baudrate=baudrate,
+                timeout=timeout,
+                xonxoff=False,
+                rtscts=False,
+                write_timeout=timeout,
+                dsrdtr=False,
+                inter_byte_timeout=None
+            )
+        except serial.SerialException as e:
+            self.serial = None
+            raise
 
     def send_command(self, command: bytes):
         self.serial.write(command)
