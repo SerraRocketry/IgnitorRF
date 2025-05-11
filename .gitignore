@@ -5,7 +5,7 @@ build/
 dist/
 
 # Ignore App.spec file
-App.spec
+app.spec
 
 # Ignore Python cache files
 __pycache__/
